@@ -1,0 +1,5 @@
+Yumen,2,0,5,0
+Xi'an,3,3,3,0
+Chengdu,3,1,2,0
+Shenyang,1,5,5,0
+Nanjing,3,4,2,0

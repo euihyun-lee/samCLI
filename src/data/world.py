@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-class City(object):
+class City:
     SIZE = [0, 1, 2, 3] # small, medium, big, huge
     CITY_TYPE = [0] # TBD 
     def __init__(self, name, size, pos, city_type=0):
@@ -22,7 +22,7 @@ class City(object):
         self.people = []
 
 
-class Road(object):
+class Road:
     def __init__(self, city_from, city_to, road_type=0, name=None):
         self.city_from = city_from
         self.city_to = city_to
@@ -30,6 +30,50 @@ class Road(object):
         self.name = name
         self.people = []
         self.distance = ((city_from.x - city_to.x)**2 + (city_from.y - city_to.y)**2)**.5
+
+
+class Person:
+    def __init__(self, name: str, char: int, power: int, intel: int, adm: int, dip: int, rep: int, birth: int, death: int, force=None, city=None, location=None):
+        # Charisma(char): military power; related to army combat power
+        # Power(power): personal power; related to personal battle event
+        # Intelligence(intel): personal(military) intelligence; related to stratagem success rate
+        # Administration(adm): related to administrative action
+        # Diplomatic skill(dip): related to diplomatic action
+        # Reputation(rep): related to personal interaction 
+        self.name = name
+        self.char = char
+        self.power = power
+        self.intel = intel
+        self.adm = adm
+        self.dip = dip
+        self.rep = rep
+        self.birth = birth
+        self.death = death
+        self.force = force
+        self.city = city
+        self.location = location    # City or Road
+        self.items = []
+
+
+class Force:
+    def __init__(self, name: str, title: Title, owner: Person, color: str):
+        self.name = name
+        self.title = title
+        self.owner = owner
+        self.color = color
+
+
+class Title:
+    def __init__(self, name: str, level: int):
+        self.name = name
+        self.level = level  # int
+
+
+class HanTitle(Title):
+    TITLES = ["Emperor", "King", "Duke"]
+    def __init__(self, level: int):
+        Title.__init__(self, TITLES[level], level)
+        
 
 class World(nx.Graph):
     def __init__(self):
@@ -63,7 +107,6 @@ class World(nx.Graph):
                 city_from = self.get_city_by_name(city_from_name)
                 city_to = self.get_city_by_name(city_to_name)
                 self.add_road(city_from, city_to)
-
 
     def get_city_list(self):
         return list(self.nodes)

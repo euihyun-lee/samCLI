@@ -1,106 +1,36 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+from typing import List
 
-class City:
-    SIZE = [0, 1, 2, 3] # small, medium, big, huge
-    CITY_TYPE = [0] # TBD 
-    def __init__(self, name, size, pos, city_type=0):
-        assert type(name) is str
-        assert size in self.SIZE
-        assert type(pos) is tuple
-        assert len(pos) == 2
-        assert type(pos[0]) is int
-        assert type(pos[1]) is int
-        assert city_type in self.CITY_TYPE
-
-        self.name = name
-        self.size = size
-        self.pos = pos
-        self.x, self.y = pos
-        self.city_type = city_type
-        self.owner = None
-        self.people = []
-
-
-class Road:
-    def __init__(self, city_from, city_to, road_type=0, name=None):
-        self.city_from = city_from
-        self.city_to = city_to
-        self.road_type = road_type
-        self.name = name
-        self.people = []
-        self.distance = ((city_from.x - city_to.x)**2 + (city_from.y - city_to.y)**2)**.5
-
-
-class Person:
-    def __init__(self, name: str, char: int, power: int, intel: int, adm: int, dip: int, rep: int, birth: int, death: int, force=None, city=None, location=None):
-        # Charisma(char): military power; related to army combat power
-        # Power(power): personal power; related to personal battle event
-        # Intelligence(intel): personal(military) intelligence; related to stratagem success rate
-        # Administration(adm): related to administrative action
-        # Diplomatic skill(dip): related to diplomatic action
-        # Reputation(rep): related to personal interaction 
-        self.name = name
-        self.char = char
-        self.power = power
-        self.intel = intel
-        self.adm = adm
-        self.dip = dip
-        self.rep = rep
-        self.birth = birth
-        self.death = death
-        self.force = force
-        self.city = city
-        self.location = location    # City or Road
-        self.items = []
-
-
-class Force:
-    def __init__(self, name: str, title: Title, owner: Person, color: str):
-        self.name = name
-        self.title = title
-        self.owner = owner
-        self.color = color
-
-
-class Title:
-    def __init__(self, name: str, level: int):
-        self.name = name
-        self.level = level  # int
-
-
-class HanTitle(Title):
-    TITLES = ["Emperor", "King", "Duke"]
-    def __init__(self, level: int):
-        Title.__init__(self, TITLES[level], level)
-        
+from .location import City
+from .value import Color
 
 class World(nx.Graph):
     def __init__(self):
         super().__init__()
 
-    def add_city(self, city):
+    def add_city(self, city: City):
         self.add_node(city)
 
-    def add_cities_from_list(self, city_list):
+    def add_cities_from_list(self, city_list: List[City]):
         self.add_nodes_from(city_list)
 
-    def add_cities_from_csv(self, filename):
+    def add_cities_from_csv(self, filename: str):
         with open(filename, 'r') as f:
             for line in f:
                 name, size, x, y, city_type = line.strip().split(',')
                 city = City(name, int(size), (int(x), int(y)), int(city_type))
                 self.add_city(city)
 
-    def add_road(self, city_from, city_to):
+    def add_road(self, city_from: City, city_to: City):
         dist = ((city_from.x - city_to.x)**2 + (city_from.y - city_to.y)**2)**.5
         self.add_edge(city_from, city_to, weight=dist)
 
-    def add_roads_from_list(self, city_from_to_list):
+    def add_roads_from_list(self, city_from_to_list: List[City]):
         for city_from, city_to in city_from_to_list:
             self.add_road(city_from, city_to)
 
-    def add_roads_from_csv(self, filename):
+    def add_roads_from_csv(self, filename: str):
         with open(filename, 'r') as f:
             for line in f:
                 city_from_name, city_to_name = line.strip().split(',')
@@ -108,10 +38,10 @@ class World(nx.Graph):
                 city_to = self.get_city_by_name(city_to_name)
                 self.add_road(city_from, city_to)
 
-    def get_city_list(self):
+    def get_city_list(self) -> list:
         return list(self.nodes)
 
-    def get_city_by_name(self, name):
+    def get_city_by_name(self, name: str) -> City:
         city_list = self.get_city_list()
         for city in city_list:
             if city.name == name:
@@ -121,8 +51,10 @@ class World(nx.Graph):
         return None
 
     def draw_world(self):
-        city_pos_list = {city: city.pos for city in self.get_city_list()}
-        city_size_list = [(city.size+1)*100 for city in self.get_city_list()]
+        city_list = self.get_city_list()
+        city_pos_list = {city: city.pos for city in city_list}
+        city_size_list = [(city.size+1)*100 for city in city_list]
+        city_color_list = [city.owner.force.color if not city.owner is None else Color.WHITE for city in city_list]
         nx.draw_networkx_edges(self, city_pos_list)
-        nx.draw_networkx_nodes(self, city_pos_list, node_size=city_size_list)
+        nx.draw_networkx_nodes(self, city_pos_list, node_size=city_size_list, node_color=city_color_list)
         plt.show()

@@ -1,4 +1,5 @@
-from data.world import City, World
+from data.world import World
+from data.location import City
 
 if __name__ == "__main__":
     world = World()

@@ -1,4 +1,4 @@
-Yumen,Xi'an
-Chengdu,Xi'an
-Xi'an,Shenyang
-Xi'an,Nanjing
+0,0,1
+1,2,1
+2,1,3
+3,1,4

@@ -1,0 +1,4 @@
+# ID, name, titleGroup, title, ownerID, flagColor
+0,Wei,0,0,0,#0000FF
+1,Wu,0,1,1,#FF0000
+2,Chu,0,0,2,#00FF00
